@@ -29,15 +29,15 @@ public class CSVReader_Writer {
                     .flatMap(line -> Stream.of(line.split(",")))
                     .collect(Collectors.toList());
         } catch (FileNotFoundException e) {
-            System.out.println("File was not found. " + e.getMessage());
+            System.err.println("File was not found. " + e.getMessage());
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Something with IO went wrong ");
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    System.out.println("Error closing the reader: " + e.getMessage());
+                    System.err.println("Error closing the reader: " + e.getMessage());
                 }
             }
         }
@@ -59,10 +59,9 @@ public class CSVReader_Writer {
                     .flatMap(line -> Stream.of(line.split(",")))
                     .collect(Collectors.toList());
         } catch (FileNotFoundException e) {
-            System.out.println("File was not found! " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("File was not found! " + e.getMessage());
         } catch (IOException e) {
-            System.out.println("Error reading file " + e.getMessage());
+            System.err.println("Error reading file " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -81,15 +80,18 @@ public class CSVReader_Writer {
     public static List<String> getLastNames() throws IOException {
 
         List<String> names = null;
+        BufferedReader reader = null;
 
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("lastnames.txt"))) {
+        try {
+            reader = Files.newBufferedReader(Paths.get("lastnames.txt"));
             names = reader.lines()
                     .flatMap(line -> Stream.of(line.split(",")))
                     .collect(Collectors.toList());
 
-        } catch (IOException e) {
-            System.out.println("An error occurred while fetching lastnames: " + e.getMessage());
-            throw e;
+        } finally {
+            if (reader != null) {
+                reader.close();
+            }
         }
         return names;
     }
@@ -102,21 +104,22 @@ public class CSVReader_Writer {
                 writer.append(toWrite + ",");
             }
             writer.flush();
-
         } catch (IOException e) {
-            System.out.println("An error occurred while trying to save lastnames: " + e.getMessage());
+            System.err.println("An error occurred while trying to save lastnames: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     public static void saveFemaleNames(List<String> femaleNames) {
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get("firstname_female.txt"))) {
+        try (
+                BufferedWriter writer = Files.newBufferedWriter(Paths.get("firstname_female.txt"))
+        ) {
             for (String toWrite : femaleNames) {
                 writer.append(toWrite + ",");
             }
             writer.flush();
         } catch (IOException e) {
-            System.out.println("An error occurred while trying to save names: " + e.getMessage());
+            System.err.println("An error occurred while trying to save names: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -130,6 +133,7 @@ public class CSVReader_Writer {
                 writer.append(toWrite + ",");
             }
             writer.flush();
+
         } catch (IOException e) {
             System.out.println("An error occurred while trying to save names: " + e.getMessage());
             e.printStackTrace();
